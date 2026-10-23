@@ -1,0 +1,790 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Graflar doskasi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: kataklik daftar fonida yorqin doska; tepada rangli bo'lim tugmalari, ostida chizma (chapda) va vazifa (o'ngda) */
+:root{
+  --ink:#1b2559; --ink2:#4a5688; --paper:#ffffff; --bg:#eef6ff; --line:#cfe2fb;
+  --coral:#ff4d5a; --sun:#ffb400; --mint:#12b886; --sky:#2f80ff; --violet:#8b5cf6; --pink:#ff6fa8; --lime:#6cc72c; --orange:#ff8a2b;
+  --ok:#12a150; --okbg:#dcf8e6; --bad:#d6283a; --badbg:#ffe3e6; --infobg:#fff3c9;
+  --f-display:'Fredoka','Trebuchet MS','Segoe UI',sans-serif; --f-body:'Nunito','Segoe UI',Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{font-size:16px} html.big{font-size:20px}
+body{margin:0;background-color:var(--bg);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:28px 28px;color:var(--ink);font-family:var(--f-body);font-weight:600;font-size:1rem;line-height:1.5;
+  padding-block:20px 90px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1200px;margin:0 auto;position:relative}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;line-height:1.15}
+p{margin:0}
+.top{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.top h1{font-size:clamp(2rem,6vw,3.4rem);font-weight:700;letter-spacing:.01em}
+.top h1 span:nth-child(1){color:var(--coral)}.top h1 span:nth-child(2){color:var(--sky)}
+.top .sub{color:var(--ink2);max-width:46ch;margin-top:4px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 8px}
+.tab{--c:var(--sky);font:600 1rem var(--f-display);color:var(--ink);background:var(--paper);border:3px solid var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer;box-shadow:0 4px 0 var(--ink);display:flex;gap:8px;align-items:center;min-height:44px}
+.tab i{font-style:normal;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--c);color:#fff;font-size:.9rem}
+.tab[aria-selected=true]{background:var(--c);color:#fff;transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}
+.tab[aria-selected=true] i{background:#fff;color:var(--c)}
+.tab .done{font-size:.8rem}
+.btn{font:600 .95rem var(--f-display);color:var(--ink);background:var(--paper);border:3px solid var(--ink);border-radius:12px;padding:7px 14px;cursor:pointer;box-shadow:0 3px 0 var(--ink);min-height:40px}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.btn.pri{background:var(--sun)}.btn.go{background:var(--mint);color:#fff}.btn.red{background:var(--coral);color:#fff}
+.btn[aria-pressed=true]{background:var(--violet);color:#fff}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:4px solid var(--sky);outline-offset:2px}
+.progress{font-family:var(--f-display);color:var(--ink2);display:flex;gap:10px;align-items:center;margin:4px 0 14px}
+.pbar{flex:0 1 220px;height:14px;border:3px solid var(--ink);border-radius:99px;background:var(--paper);overflow:hidden}
+.pbar b{display:block;height:100%;width:0;background:var(--lime);transition:width .4s}
+.view[hidden]{display:none}
+.sec-head{display:flex;flex-direction:column;gap:6px;margin:10px 0 14px;max-width:80ch}
+.sec-head h2{font-size:clamp(1.5rem,4vw,2.2rem)}
+.sec-head .rule{background:var(--infobg);border:3px solid var(--ink);border-radius:14px;padding:10px 14px}
+.extabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.extab{font:600 1rem var(--f-display);border:3px solid var(--ink);border-radius:14px;background:var(--paper);padding:8px 14px;cursor:pointer;display:flex;gap:8px;align-items:center;color:var(--ink);min-height:44px}
+.extab[aria-selected=true]{background:var(--ink);color:#fff}
+.extab .stars{letter-spacing:2px;color:var(--sun);font-size:.9rem}
+.extab.solved{border-color:var(--ok)}
+.ex{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:860px){.ex{grid-template-columns:minmax(0,1fr)}}
+.board{background:var(--paper);border:4px solid var(--ink);border-radius:20px;box-shadow:6px 6px 0 var(--ink);
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:24px 24px;padding:8px;min-width:0}
+.board svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:12px 14px;min-width:0}
+.card h3{font-size:1.25rem;margin-bottom:4px}
+.lvl{display:inline-block;font:600 .8rem var(--f-display);letter-spacing:.06em;text-transform:uppercase;padding:2px 10px;border-radius:99px;color:#fff;margin-bottom:6px}
+.lvl.l1{background:var(--mint)}.lvl.l2{background:var(--orange)}.lvl.l3{background:var(--coral)}
+.task{font-size:1.05rem;font-weight:800;margin-top:6px}
+.opts{display:grid;gap:8px}
+.opt{font:700 1rem var(--f-body);text-align:left;color:var(--ink);background:var(--paper);border:3px solid var(--ink);border-radius:12px;padding:9px 12px;cursor:pointer;min-height:44px}
+.opt:hover{background:#f0f6ff}
+.opt.right{background:var(--okbg);border-color:var(--ok)}.opt.wrong{background:var(--badbg);border-color:var(--bad)}
+.fb{border-radius:12px;padding:10px 12px;border:3px solid var(--ink);font-weight:700}
+.fb[hidden]{display:none}
+.fb.ok{background:var(--okbg);border-color:var(--ok)}.fb.bad{background:var(--badbg);border-color:var(--bad)}.fb.info{background:var(--infobg)}
+.fields{display:grid;grid-template-columns:1fr auto;gap:8px 10px;align-items:center}
+.fields label{font-weight:800}
+input.num{width:4.2rem;font:700 1.2rem var(--f-display);text-align:center;color:var(--ink);background:var(--paper);border:3px solid var(--ink);border-radius:10px;padding:4px;min-height:44px}
+input.num.ok{background:var(--okbg);border-color:var(--ok)}input.num.bad{background:var(--badbg);border-color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.mx{border-collapse:separate;border-spacing:6px;margin:4px auto}
+.mx th{font:700 1.3rem var(--f-display);width:2.6rem;color:var(--ink)}
+.mx th.c{color:#fff;border-radius:10px;height:2.6rem}
+.mx td{padding:0}
+.mxbox{overflow-x:auto}
+.steps summary{cursor:pointer;font:600 1.05rem var(--f-display);min-height:36px}
+.steps .body{margin-top:6px;display:grid;gap:6px}
+.steps table{border-collapse:collapse;font-variant-numeric:tabular-nums;width:100%}
+.steps td,.steps th{border:2px solid var(--ink);padding:3px 6px;text-align:center}
+.wtab{overflow-x:auto}
+.wtab table{border-collapse:collapse;font-variant-numeric:tabular-nums;margin:auto}
+.wtab td,.wtab th{border:2px solid var(--ink);padding:2px 8px;text-align:center;font-weight:800}
+.wtab th{background:var(--infobg);font-family:var(--f-display)}
+.pill{display:inline-block;border:2px solid var(--ink);border-radius:99px;padding:0 10px;background:var(--infobg);font-weight:800}
+.big-n{font:700 2rem var(--f-display)}
+/* SVG chizma */
+svg .e{stroke:var(--ink);stroke-width:4;fill:none;stroke-linecap:round}
+svg .e.used{stroke:var(--mint);stroke-width:8}
+svg .e.hl{stroke:var(--sun);stroke-width:8}
+svg .e.hl2{stroke:var(--violet);stroke-width:6}
+svg .hit{stroke:transparent;stroke-width:22;fill:none}
+svg .e.mark{stroke:var(--pink);stroke-width:8}
+svg .nd circle{stroke:var(--ink);stroke-width:4}
+svg.click .nd,svg.click .hit{cursor:pointer}
+svg .nd.sel circle{stroke:var(--coral);stroke-width:8}
+svg .nd.cur circle{stroke:var(--violet);stroke-width:8}
+svg .nd text.l{font:700 22px var(--f-display);fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+svg .nd text.em{font-size:30px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+svg .nd .nm{font:700 17px var(--f-display);fill:var(--ink);text-anchor:middle;pointer-events:none}
+svg .nd .nmbg{fill:#fff;stroke:var(--ink);stroke-width:2}
+svg .wt rect{fill:#fff;stroke:var(--ink);stroke-width:3}
+svg .wt text{font:700 20px var(--f-display);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+svg .dg circle{stroke:var(--ink);stroke-width:3}
+svg .dg text{font:700 16px var(--f-display);fill:#fff;text-anchor:middle;dominant-baseline:central}
+/* Nazariya */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px;margin:10px 0 22px}
+.life{background:var(--paper);border:3px solid var(--ink);border-radius:18px;padding:12px;text-align:center;box-shadow:0 5px 0 var(--ink);cursor:pointer;transition:transform .15s;position:relative}
+.life:hover{transform:translateY(-3px);box-shadow:0 8px 0 var(--ink)}
+.life:active{transform:translateY(2px);box-shadow:0 3px 0 var(--ink)}
+.life .pic{font-size:3rem;line-height:1.1}
+.life h3{font-size:1.2rem;margin:4px 0}
+.life p{font-size:.95rem;color:var(--ink2)}
+.life .hint-tap{position:absolute;top:8px;right:10px;font-size:.75rem;color:var(--sky);font-weight:800}
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(27,37,89,.55);z-index:60;display:grid;place-items:center;padding:16px;overflow-y:auto}
+.modal{background:var(--paper);border:4px solid var(--ink);border-radius:20px;box-shadow:8px 8px 0 var(--ink);max-width:560px;width:100%;padding:16px;position:relative;margin:auto}
+.modal h3{font-size:1.5rem;margin-bottom:6px;padding-right:40px}
+.modal .x{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:3px solid var(--ink);background:var(--coral);color:#fff;font:700 1.2rem var(--f-display);cursor:pointer;display:grid;place-items:center;padding:0}
+.modal .board{padding:4px}
+.modal .facts{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.modal .facts .pill{font-size:.95rem;padding:4px 12px}
+.modal .why{background:var(--infobg);border:3px solid var(--ink);border-radius:12px;padding:8px 12px;margin-top:8px;font-size:.95rem}
+.theo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin:12px 0 22px;align-items:start}
+@media (max-width:860px){.theo{grid-template-columns:minmax(0,1fr)}}
+.theo .txt{display:grid;gap:10px}
+.defs{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.defs li{display:flex;gap:10px;align-items:baseline}
+.defs b{font:600 1.05rem var(--f-display);color:#fff;border-radius:8px;padding:1px 10px;white-space:nowrap}
+.kb{background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:6px}
+.kb svg{display:block;width:100%;height:auto}
+.sumline{font:600 1.3rem var(--f-display);text-align:center;padding:6px;min-height:2.4rem}
+/* Eyler qoidasi jadvali */
+.eyler-rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px;margin:10px 0 22px}
+.eyler-rule .rc{border:3px solid var(--ink);border-radius:16px;padding:10px;background:var(--paper);box-shadow:0 4px 0 var(--ink)}
+.eyler-rule .rc.good{border-color:var(--ok)}
+.eyler-rule .rc.bad{border-color:var(--bad)}
+.eyler-rule .rc h3{font-size:1.15rem;margin-bottom:4px}
+.eyler-rule .rc .tag{display:inline-block;font:700 .8rem var(--f-display);padding:2px 10px;border-radius:99px;color:#fff;margin-bottom:6px}
+.eyler-rule .rc.good .tag{background:var(--ok)}
+.eyler-rule .rc.bad .tag{background:var(--bad)}
+.eyler-rule .rc .kb{padding:2px;border:none;box-shadow:none}
+.eyler-rule .rc p{font-size:.92rem;margin-top:6px}
+/* Qalam */
+#pen{position:absolute;left:0;top:0;z-index:30;display:none;touch-action:none;cursor:crosshair}
+#pen.on{display:block}
+#pentools{position:fixed;z-index:40;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));display:none;gap:8px;align-items:center;background:var(--paper);border:3px solid var(--ink);border-radius:99px;padding:6px 10px;box-shadow:0 5px 0 var(--ink);max-width:calc(100vw - 24px);flex-wrap:wrap;justify-content:center}
+#pentools.on{display:flex}
+.sw{width:34px;height:34px;border-radius:50%;border:3px solid var(--ink);cursor:pointer;padding:0}
+.sw[aria-pressed=true]{outline:4px solid var(--sky);outline-offset:1px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap" id="wrap">
+  <header class="top">
+    <div>
+      <h1><span>Graflar</span> <span>doskasi</span></h1>
+      <p class="sub">Uchlar, qirralar, matritsa, Eyler yo'li va eng qisqa yo'l. Har bir yo'nalishda 3–4 tadan misol: oddiydan murakkabga.</p>
+    </div>
+    <div class="tools">
+      <button class="btn" id="bigBtn" aria-pressed="false" type="button">Katta shrift</button>
+      <button class="btn pri" id="penBtn" aria-pressed="false" type="button">Qalam bilan chizish</button>
+    </div>
+  </header>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Bo'limlar"></nav>
+  <div class="progress"><span id="ptxt">Bajarildi: 0 / 20</span><div class="pbar"><b id="pfill"></b></div></div>
+  <main id="app"></main>
+  <canvas id="pen"></canvas>
+</div>
+<div id="pentools">
+  <button class="sw" data-c="#ff4d5a" style="background:#ff4d5a" aria-label="Qizil" type="button"></button>
+  <button class="sw" data-c="#2f80ff" style="background:#2f80ff" aria-label="Ko'k" type="button" aria-pressed="true"></button>
+  <button class="sw" data-c="#12b886" style="background:#12b886" aria-label="Yashil" type="button"></button>
+  <button class="sw" data-c="#ff8a2b" style="background:#ff8a2b" aria-label="To'q sariq" type="button"></button>
+  <button class="sw" data-c="#1b2559" style="background:#1b2559" aria-label="Qora" type="button"></button>
+  <button class="btn" id="penClear" type="button">Tozalash</button>
+  <button class="btn red" id="penOff" type="button">Tugatish</button>
+</div>
+<script>
+(function(){
+'use strict';
+const PAL=['#ff7b7b','#ffd25c','#5fd8c7','#6db3ff','#c1a3fa','#ff9ccb','#a6e86a','#ffb066','#7de3d0'];
+const R=26; let uid=0;
+const $=(s,r)=>(r||document).querySelector(s);
+const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+const LV=['Oson','O\'rta','Qiyin'];
+
+/* ---------- graf yordamchilari ---------- */
+function deg(g){const d=g.n.map(()=>0);g.e.forEach(([a,b])=>{if(a===b)d[a]+=2;else{d[a]++;d[b]++;}});return d;}
+function nb(g){const m=g.n.map(()=>[]);g.e.forEach(([a,b])=>{m[a].push(b);if(a!==b)m[b].push(a);});return m;}
+function comps(g){const m=nb(g),c=g.n.map(()=>-1);let k=0;for(let s=0;s<g.n.length;s++){if(c[s]>=0)continue;const q=[s];c[s]=k;while(q.length){const u=q.shift();m[u].forEach(v=>{if(c[v]<0){c[v]=k;q.push(v);}});}k++;}return {c,k};}
+function bfsPath(g,s,t){const m=nb(g),p=g.n.map(()=>-2);p[s]=-1;const q=[s];while(q.length){const u=q.shift();if(u===t)break;m[u].forEach(v=>{if(p[v]===-2){p[v]=u;q.push(v);}});}if(p[t]===-2)return null;const r=[];for(let x=t;x!==-1;x=p[x])r.unshift(x);return r;}
+function edgeBetween(g,a,b,skip){let best=-1;g.e.forEach((e,i)=>{if(skip&&skip.has(i))return;if((e[0]===a&&e[1]===b)||(e[0]===b&&e[1]===a)){if(best<0||(e[2]!=null&&e[2]<g.e[best][2]))best=i;}});return best;}
+function dijkstra(g,s){const n=g.n.length,d=Array(n).fill(Infinity),prev=Array(n).fill(-1),dn=Array(n).fill(false),steps=[];d[s]=0;
+  for(let k=0;k<n;k++){let u=-1;for(let i=0;i<n;i++)if(!dn[i]&&(u<0||d[i]<d[u]))u=i;if(u<0||d[u]===Infinity)break;dn[u]=true;
+    g.e.forEach(([a,b,w])=>{[[a,b],[b,a]].forEach(([x,y])=>{if(x===u&&!dn[y]&&d[u]+w<d[y]){d[y]=d[u]+w;prev[y]=u;}});});
+    steps.push({u,d:d.slice(),dn:dn.slice()});}
+  return {d,prev,steps};}
+const nm=(g,i)=>g.n[i][0];
+
+/* ---------- chizish ---------- */
+function geo(g){
+  const grp={};
+  g.e.forEach((ed,i)=>{const k=Math.min(ed[0],ed[1])+'-'+Math.max(ed[0],ed[1]);(grp[k]=grp[k]||[]).push(i);});
+  return g.e.map((ed,i)=>{
+    const a=ed[0],b=ed[1],A=g.n[a],B=g.n[b];
+    if(a===b){const x=A[1],y=A[2];return {i,loop:true,d:`M${x-14},${y-R+3}C${x-52},${y-R-60} ${x+52},${y-R-60} ${x+14},${y-R+3}`,mid:[x,y-R-42]};}
+    const k=Math.min(a,b)+'-'+Math.max(a,b),arr=grp[k],m=arr.length,idx=arr.indexOf(i);
+    const lo=g.n[Math.min(a,b)],hi=g.n[Math.max(a,b)];
+    const dx=hi[1]-lo[1],dy=hi[2]-lo[2],len=Math.hypot(dx,dy)||1,off=m>1?(idx-(m-1)/2)*52:0;
+    const cx=(A[1]+B[1])/2-dy/len*off*2,cy=(A[2]+B[2])/2+dx/len*off*2;
+    const mv=(P,Q,d)=>{const vx=Q[0]-P[0],vy=Q[1]-P[1],l=Math.hypot(vx,vy)||1;return [P[0]+vx/l*d,P[1]+vy/l*d];};
+    const s=mv([A[1],A[2]],[cx,cy],R),t=mv([B[1],B[2]],[cx,cy],R+(g.dir?6:0));
+    return {i,d:`M${s[0]},${s[1]}Q${cx},${cy} ${t[0]},${t[1]}`,mid:[.25*s[0]+.5*cx+.25*t[0],.25*s[1]+.5*cy+.25*t[1]]};
+  });
+}
+function draw(host,g,st){
+  st=st||{};const id='mk'+(++uid),gs=geo(g),dg=deg(g);
+  let h=`<svg viewBox="0 0 600 400" role="img" aria-label="${g.alt||'Graf chizmasi'}" class="${st.onNode||st.onEdge?'click':''}"><defs><marker id="${id}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0,0L10,5L0,10z" fill="#1b2559"/></marker></defs>`;
+  gs.forEach(o=>{const c=(st.edgeCls&&st.edgeCls[o.i])||'';
+    h+=`<path class="e ${c}" d="${o.d}"${g.dir&&!o.loop?` marker-end="url(#${id})"`:''}/>`;});
+  if(st.onEdge)gs.forEach(o=>{h+=`<path class="hit" data-e="${o.i}" d="${o.d}"/>`;});
+  gs.forEach(o=>{const w=g.e[o.i][2];if(w!=null)h+=`<g class="wt" transform="translate(${o.mid[0]},${o.mid[1]})"><rect x="-19" y="-15" width="38" height="30" rx="10"/><text>${w}</text></g>`;});
+  g.n.forEach((n,i)=>{const lab=n[0],em=n[3],long=lab.length>2,cls='nd '+((st.nodeCls&&st.nodeCls[i])||''),fill=(st.col&&st.col[i])||PAL[i%PAL.length];
+    h+=`<g class="${cls}" data-i="${i}" transform="translate(${n[1]},${n[2]})"><circle r="${R}" fill="${fill}"/>`;
+    if(em)h+=`<text class="em">${em}</text>`;else h+=`<text class="l">${long?lab[0]:lab}</text>`;
+    if(long||(em&&lab)){const w=lab.length*9.5+16;h+=`<rect class="nmbg" x="${-w/2}" y="${R+3}" width="${w}" height="24" rx="9"/><text class="nm" y="${R+20}">${lab}</text>`;}
+    h+=`</g>`;});
+  if(st.showDeg)g.n.forEach((n,i)=>{h+=`<g class="dg" transform="translate(${n[1]+R-1},${n[2]-R+1})"><circle r="14" fill="${dg[i]%2?'#ff4d5a':'#0b8f6a'}"/><text>${dg[i]}</text></g>`;});
+  h+='</svg>';host.innerHTML=h;
+  host.onclick=e=>{const hit=e.target.closest('.hit');if(hit&&st.onEdge){st.onEdge(+hit.dataset.e);return;}const nd=e.target.closest('.nd');if(nd&&st.onNode)st.onNode(+nd.dataset.i);};
+}
+window.GD={draw,deg,nb,comps,bfsPath,edgeBetween,dijkstra,PAL};
+
+/* ---------- jarayon ---------- */
+let solved=new Set();
+try{solved=new Set(JSON.parse(localStorage.getItem('graflar-solved')||'[]'));}catch(e){}
+function save(){try{localStorage.setItem('graflar-solved',JSON.stringify([...solved]));}catch(e){}}
+function total(){return window.SECTIONS.reduce((s,x)=>s+x.exs.length,0);}
+function updProg(){
+  const t=total(),n=[...solved].filter(k=>window.SECTIONS.some(s=>k.startsWith(s.id+':'))).length;
+  $('#ptxt').textContent=`Bajarildi: ${n} / ${t}`;$('#pfill').style.width=(n/t*100)+'%';
+  window.SECTIONS.forEach(s=>{const c=s.exs.filter((_,k)=>solved.has(s.id+':'+k)).length;const tb=$('.tab[data-id="'+s.id+'"] .done');if(tb)tb.textContent=c?`${c}/${s.exs.length}`:'';});
+}
+function scaffold(ex,k){
+  const root=document.createElement('div');root.className='ex';
+  root.innerHTML=`<div class="board"></div><div class="side"><div class="card"><span class="lvl l${Math.min(k+1,3)}">${LV[Math.min(k,2)]}</span><h3>${ex.title}</h3><p>${ex.story}</p><p class="task">${ex.task}</p></div><div class="ctl side"></div></div>`;
+  return {root,board:$('.board',root),ctl:$('.ctl',root)};
+}
+const fbShow=(el,cls,html)=>{el.hidden=false;el.className='fb '+cls;el.innerHTML=html;};
+const pathTxt=(g,p)=>p.map(i=>nm(g,i)).join(' → ');
+function stepsBox(html){return `<details class="card steps"><summary>Doskada yechilishi</summary><div class="body">${html}</div></details>`;}
+
+const MODES={
+quiz(ex,sc,done){
+  const g=ex.g;draw(sc.board,g);
+  sc.ctl.innerHTML=`<div class="opts">${ex.opts.map((o,i)=>`<button class="opt" data-i="${i}" type="button">${o}</button>`).join('')}</div><div class="fb" hidden></div>${stepsBox(ex.steps)}`;
+  const fb=$('.fb',sc.ctl);let ok=false;
+  $$('.opt',sc.ctl).forEach(b=>b.onclick=()=>{if(ok)return;const i=+b.dataset.i;
+    if(i===ex.ans){ok=true;b.classList.add('right');fbShow(fb,'ok','To\'g\'ri! '+ex.why);done();}
+    else{b.classList.add('wrong');fbShow(fb,'bad','Yana o\'ylab ko\'ring. '+ex.hint);}});
+},
+count(ex,sc,done){
+  const g=ex.g,E=g.e.length,N=g.n.length,dg=deg(g),odd=dg.filter(x=>x%2).length,S=dg.reduce((a,b)=>a+b,0);
+  const st={nodeCls:{},edgeCls:{},showDeg:false};
+  const rd=()=>{st.onNode=i=>{st.nodeCls[i]=st.nodeCls[i]?'':'sel';rd();upd();};st.onEdge=i=>{st.edgeCls[i]=st.edgeCls[i]?'':'mark';rd();upd();};draw(sc.board,g,st);};
+  sc.ctl.innerHTML=`<div class="card"><div class="row"><span class="pill" id="cn">Belgilangan uchlar: 0</span><span class="pill" id="ce">Belgilangan qirralar: 0</span></div><p style="margin-top:6px;font-size:.92rem">Uchni yoki qirrani bosib belgilang. Sanashda adashmaysiz.</p></div>
+  <div class="card"><div class="fields"><label for="f1">Uchlar soni</label><input class="num" id="f1" inputmode="numeric" maxlength="2"><label for="f2">Qirralar soni</label><input class="num" id="f2" inputmode="numeric" maxlength="2"><label for="f3">Toq uchlar soni</label><input class="num" id="f3" inputmode="numeric" maxlength="2"></div>
+  <div class="row" style="margin-top:10px"><button class="btn go" id="chk" type="button">Tekshirish</button><button class="btn" id="dgb" type="button" aria-pressed="false">Darajalarni ko'rsat</button><button class="btn" id="clr" type="button">Belgilarni o'chirish</button></div></div><div class="fb" hidden></div>${stepsBox(ex.steps)}`;
+  const upd=()=>{$('#cn',sc.ctl).textContent='Belgilangan uchlar: '+Object.values(st.nodeCls).filter(Boolean).length;$('#ce',sc.ctl).textContent='Belgilangan qirralar: '+Object.values(st.edgeCls).filter(Boolean).length;};
+  $('#dgb',sc.ctl).onclick=e=>{st.showDeg=!st.showDeg;e.currentTarget.setAttribute('aria-pressed',st.showDeg);rd();};
+  $('#clr',sc.ctl).onclick=()=>{st.nodeCls={};st.edgeCls={};rd();upd();};
+  $('#chk',sc.ctl).onclick=()=>{const want=[N,E,odd];let all=true;
+    ['f1','f2','f3'].forEach((id,i)=>{const el=$('#'+id,sc.ctl),v=el.value.trim()===''?NaN:+el.value;const r=v===want[i];all=all&&r;el.className='num '+(r?'ok':'bad');});
+    const fb=$('.fb',sc.ctl);
+    if(all){fbShow(fb,'ok',`Barakalla! Darajalar: ${dg.join(' + ')} = ${S}. Bu qirralar sonining ikki baravari: 2 × ${E} = ${S}. Toq uchlar soni (${odd}) juft, 2-teorema ham o'rinli.`);done();}
+    else fbShow(fb,'bad','Hammasi to\'g\'ri emas. Qizil katakchani qayta sanang. "Darajalarni ko\'rsat" tugmasi yordam beradi.');};
+  rd();
+},
+matrix(ex,sc,done){
+  const g=ex.g,n=g.n.length,M=g.n.map(()=>g.n.map(()=>0));
+  g.e.forEach(([a,b])=>{M[a][b]++;if(!g.dir&&a!==b)M[b][a]++;});
+  const st={nodeCls:{},edgeCls:{}};const rd=()=>draw(sc.board,g,st);
+  let t='<table class="mx"><tr><th></th>'+g.n.map((x,j)=>`<th class="c" style="background:${PAL[j%9]};color:var(--ink)">${x[0]}</th>`).join('')+'</tr>';
+  for(let i=0;i<n;i++){t+=`<tr><th class="c" style="background:${PAL[i%9]};color:var(--ink)">${g.n[i][0]}</th>`+g.n.map((_,j)=>`<td><input class="num" data-i="${i}" data-j="${j}" inputmode="numeric" maxlength="2" aria-label="${g.n[i][0]} qator, ${g.n[j][0]} ustun"></td>`).join('')+'</tr>';}
+  t+='</table>';
+  sc.ctl.innerHTML=`<div class="card"><div class="fb info" style="margin-bottom:8px">${ex.rule}</div><div class="mxbox">${t}</div><div class="row" style="margin-top:8px"><button class="btn go" id="chk" type="button">Tekshirish</button><button class="btn" id="clr" type="button">Tozalash</button></div></div><div class="fb" hidden></div>${stepsBox(ex.steps)}`;
+  const ins=$$('input',sc.ctl);
+  ins.forEach(inp=>{inp.onfocus=()=>{const i=+inp.dataset.i,j=+inp.dataset.j;st.nodeCls={[i]:'cur',[j]:'sel'};st.edgeCls={};g.e.forEach((e,k)=>{if((e[0]===i&&e[1]===j)||(!g.dir&&e[0]===j&&e[1]===i))st.edgeCls[k]='hl';});rd();};});
+  $('#clr',sc.ctl).onclick=()=>{ins.forEach(x=>{x.value='';x.className='num';});};
+  $('#chk',sc.ctl).onclick=()=>{let all=true;ins.forEach(x=>{const v=x.value.trim()===''?NaN:+x.value,r=v===M[+x.dataset.i][+x.dataset.j];all=all&&r;x.className='num '+(r?'ok':'bad');});
+    const fb=$('.fb',sc.ctl);if(all){fbShow(fb,'ok',ex.why);done();}else fbShow(fb,'bad','Qizil katakchalarni qayta ko\'ring. Katakchani bosganda chizmada mos uchlar va qirra yonadi.');};
+  rd();
+},
+eyler(ex,sc,done){
+  const g=ex.g,E=g.e.length;let cur=-1,path=[],used=[],showDeg=false,fin=false;
+  sc.ctl.innerHTML=`<div class="card"><p id="pt" style="font-family:var(--f-display);font-size:1.2rem;min-height:1.8rem">Yo'l: boshlash uchun uchni bosing</p><p id="rm" style="font-size:.92rem">Qolgan qirralar: ${E}</p>
+  <div class="row" style="margin-top:8px"><button class="btn" id="und" type="button">Orqaga</button><button class="btn" id="rst" type="button">Qaytadan</button><button class="btn" id="dgb" type="button" aria-pressed="false">Toq uchlarni ko'rsat</button></div></div>
+  <div class="card"><p style="font-weight:800">Mumkin emas deb o'ylasangiz:</p><button class="btn red" id="imp" type="button" style="margin-top:6px">Bu shaklni uzmay chizib bo'lmaydi</button></div><div class="fb" hidden></div>${stepsBox(ex.steps)}`;
+  const fb=$('.fb',sc.ctl);
+  const rd=()=>{const ec={},nc={};used.forEach(i=>ec[i]='used');if(cur>=0)nc[cur]='cur';
+    draw(sc.board,g,{edgeCls:ec,nodeCls:nc,showDeg,onNode:click});
+    $('#pt',sc.ctl).textContent=path.length?'Yo\'l: '+pathTxt(g,path):'Yo\'l: boshlash uchun uchni bosing';$('#rm',sc.ctl).textContent='Qolgan qirralar: '+(E-used.length);};
+  function click(v){if(fin)return;fb.hidden=true;
+    if(cur<0){cur=v;path=[v];rd();return;}
+    if(v===cur)return;
+    const set=new Set(used),e=edgeBetween(g,cur,v,set);
+    if(e<0){fbShow(fb,'bad','Bu ikki uch orasida yurilmagan qirra yo\'q. Qo\'shni uchni bosing.');return;}
+    used.push(e);path.push(v);cur=v;rd();
+    if(used.length===E){fin=true;fbShow(fb,'ok','Barakalla! Hamma qirradan bir martadan o\'tdingiz, qalamni uzmadingiz. '+ex.why);done();return;}
+    const left=g.e.some((x,i)=>!used.includes(i)&&(x[0]===cur||x[1]===cur));
+    if(!left)fbShow(fb,'info','Tiqilib qoldingiz: bu uchdan chiqadigan hamma qirra o\'tilgan, lekin yana qirralar bor. "Orqaga" yoki "Qaytadan" tugmasini bosing. Maslahat: toq uchlarni ko\'rsating.');
+  }
+  $('#und',sc.ctl).onclick=()=>{if(fin||!used.length){if(!fin&&path.length){path=[];cur=-1;rd();}return;}used.pop();path.pop();cur=path[path.length-1];fb.hidden=true;rd();};
+  $('#rst',sc.ctl).onclick=()=>{if(fin)return;cur=-1;path=[];used=[];fb.hidden=true;rd();};
+  $('#dgb',sc.ctl).onclick=e=>{showDeg=!showDeg;e.currentTarget.setAttribute('aria-pressed',showDeg);rd();};
+  $('#imp',sc.ctl).onclick=()=>{if(fin)return;const odd=deg(g).filter(x=>x%2).length;
+    if(odd>2){fin=true;fbShow(fb,'ok','To\'g\'ri! '+ex.why);done();}
+    else fbShow(fb,'bad',`Aslida chizish mumkin. Toq uchlar soni ${odd}, ya'ni 2 tadan ko'p emas. Urinib ko'ring${odd===2?' (toq uchdan boshlang)':''}.`);};
+  rd();
+},
+qisqa(ex,sc,done){
+  const g=ex.g,N=g.n.length,D=dijkstra(g,ex.from),best=D.d[ex.to];let p=[ex.from],fin=false;
+  let wt='<table><tr><th></th>'+g.n.map(x=>`<th>${x[0]}</th>`).join('')+'</tr>';
+  for(let i=0;i<N;i++){wt+=`<tr><th>${g.n[i][0]}</th>`+g.n.map((_,j)=>{const e=i===j?-1:edgeBetween(g,i,j);return `<td>${e>=0?g.e[e][2]:'–'}</td>`;}).join('')+'</tr>';}
+  wt+='</table>';
+  let sh='<table><tr><th>Qadam</th>'+g.n.map(x=>`<th>${x[0]}</th>`).join('')+'</tr>';
+  D.steps.forEach((s,k)=>{sh+=`<tr><th>${k+1}. ${nm(g,s.u)} tanlandi</th>`+s.d.map((v,i)=>`<td style="${s.dn[i]?'background:var(--okbg);font-weight:800':''}">${v===Infinity?'∞':v}</td>`).join('')+'</tr>';});
+  sh+='</table>';
+  const bp=[];for(let x=ex.to;x!==-1;x=D.prev[x])bp.unshift(x);
+  sc.ctl.innerHTML=`<div class="card"><p id="pt" style="font-family:var(--f-display);font-size:1.2rem"></p><p id="ln" class="big-n"></p><p style="font-size:.9rem">Binafsha halqa: boshlanish. Qizil halqa: manzil. Uchlarni ketma-ket bosib yo'l tuzing. Oldingi uchni bossangiz orqaga qaytasiz.</p>
+  <div class="row" style="margin-top:8px"><button class="btn" id="rst" type="button">Qaytadan</button><button class="btn pri" id="shw" type="button">Eng qisqa yo'lni ko'rsat</button></div></div>
+  <div class="fb" hidden></div><div class="card wtab"><b>Masofalar jadvali (${ex.unit})</b>${wt}</div><div id="dj" class="steps card" hidden><b>Doskada: har qadamda eng yaqin uchni tanlaymiz</b><div class="body" style="overflow-x:auto">${sh}<p>Javob: ${pathTxt(g,bp)}, jami ${best} ${ex.unit}.</p></div></div>`;
+  const fb=$('.fb',sc.ctl);let reveal=false;
+  const len=()=>{let s=0;for(let i=1;i<p.length;i++)s+=g.e[edgeBetween(g,p[i-1],p[i])][2];return s;};
+  const rd=()=>{const ec={};if(reveal){for(let i=1;i<bp.length;i++)ec[edgeBetween(g,bp[i-1],bp[i])]='hl';}
+    for(let i=1;i<p.length;i++)ec[edgeBetween(g,p[i-1],p[i])]='used';
+    const nc={};nc[ex.to]='sel';nc[ex.from]='cur';draw(sc.board,g,{edgeCls:ec,nodeCls:nc,onNode:click});
+    $('#pt',sc.ctl).textContent='Yo\'l: '+pathTxt(g,p);$('#ln',sc.ctl).textContent='Uzunligi: '+len()+' '+ex.unit;};
+  function click(v){if(fin)return;const k=p.indexOf(v);fb.hidden=true;
+    if(k>=0){p=p.slice(0,k+1);rd();return;}
+    if(edgeBetween(g,p[p.length-1],v)<0){fbShow(fb,'bad','Bu uch bilan to\'g\'ridan-to\'g\'ri yo\'l yo\'q. Faqat chiziq bilan tutashgan uchni bosing.');return;}
+    p.push(v);rd();
+    if(v===ex.to){const L=len();
+      if(L===best){fin=true;fbShow(fb,'ok',`Zo'r! ${pathTxt(g,p)}: ${L} ${ex.unit}. Bundan qisqa yo'l yo'q. ${ex.why}`);done();}
+      else fbShow(fb,'bad',`Manzilga yetdingiz, yo'l ${L} ${ex.unit}. Lekin bundan qisqaroq yo'l bor. Orqaga qaytib, boshqa yo'l sinab ko'ring.`);}}
+  $('#rst',sc.ctl).onclick=()=>{if(fin)return;p=[ex.from];fb.hidden=true;rd();};
+  $('#shw',sc.ctl).onclick=()=>{reveal=true;$('#dj',sc.ctl).hidden=false;rd();};
+  rd();
+},
+yol(ex,sc,done){
+  const g=ex.g,C=comps(g),can=C.c[ex.from]===C.c[ex.to];let fin=false,colored=false,sel=-1;
+  sc.ctl.innerHTML=`<div class="card"><div class="row"><button class="btn go" id="yes" type="button">Ha, mumkin</button><button class="btn red" id="no" type="button">Yo'q, mumkin emas</button></div></div>
+  <div class="card"><p style="font-size:.92rem;margin-bottom:6px">Uchni bossangiz, undan borish mumkin bo'lgan hamma uchlar yonadi.</p><button class="btn" id="col" type="button" aria-pressed="false">Komponentlarni ranglash</button><p id="kc" style="margin-top:6px;font-family:var(--f-display)"></p></div><div class="fb" hidden></div>${stepsBox(ex.steps)}`;
+  const fb=$('.fb',sc.ctl);
+  const rd=()=>{const nc={},ec={};nc[ex.from]='cur';nc[ex.to]='sel';
+    if(sel>=0){g.n.forEach((_,i)=>{if(C.c[i]===C.c[sel]&&i!==ex.from&&i!==ex.to)nc[i]='sel';});g.e.forEach((e,i)=>{if(C.c[e[0]]===C.c[sel])ec[i]='hl';});}
+    const col=colored?g.n.map((_,i)=>PAL[C.c[i]%9]):null;
+    draw(sc.board,g,{nodeCls:nc,edgeCls:ec,col,onNode:i=>{sel=sel===i?-1:i;rd();}});
+    $('#kc',sc.ctl).textContent=colored?`Komponentlar soni: ${C.k}`:'';};
+  $('#col',sc.ctl).onclick=e=>{colored=!colored;e.currentTarget.setAttribute('aria-pressed',colored);rd();};
+  const ans=v=>{if(fin)return;
+    if(v===can){fin=true;colored=true;const pp=can?bfsPath(g,ex.from,ex.to):null;
+      if(pp){const ec={};for(let i=1;i<pp.length;i++)ec[edgeBetween(g,pp[i-1],pp[i])]='used';
+        const nc={};nc[ex.from]='cur';nc[ex.to]='sel';draw(sc.board,g,{edgeCls:ec,nodeCls:nc});}else rd();
+      fbShow(fb,'ok','To\'g\'ri! '+(pp?`Yo'l: ${pathTxt(g,pp)}. `:`Graf ${C.k} ta bo'lakdan (komponentdan) iborat. `)+ex.why);done();}
+    else fbShow(fb,'bad',can?'Yana qarang: uchlar orasida yo\'l topilsa, borish mumkin. Uchni bosib, qaysi uchlarga yetishni tekshiring.':'Yana qarang: bu ikki uch orasida hech qanday yo\'l bo\'lmasligi mumkin. "Komponentlarni ranglash" tugmasini bosing.');};
+  $('#yes',sc.ctl).onclick=()=>ans(true);$('#no',sc.ctl).onclick=()=>ans(false);
+  rd();
+}};
+window.MODES=MODES;
+
+/* ---------- bo'lim va misol tanlash ---------- */
+function showEx(sec,k,host){
+  const sc=scaffold(sec.exs[k],k);host.innerHTML='';host.appendChild(sc.root);
+  MODES[sec.mode](sec.exs[k],sc,()=>{solved.add(sec.id+':'+k);save();updProg();const b=$$('.extab',host.parentNode)[k];if(b)b.classList.add('solved');});
+  clearPen();
+}
+function buildSec(sec){
+  const v=document.createElement('section');v.className='view';v.id='v-'+sec.id;v.hidden=true;
+  v.innerHTML=`<div class="sec-head"><h2>${sec.title}</h2><p>${sec.intro}</p><div class="rule">${sec.rule}</div></div><div class="extabs" role="tablist">${sec.exs.map((e,k)=>`<button class="extab${solved.has(sec.id+':'+k)?' solved':''}" role="tab" data-k="${k}" type="button">${k+1}-misol <span class="stars">${'★'.repeat(Math.min(k+1,3))}</span></button>`).join('')}</div><div class="exhost"></div>`;
+  const host=$('.exhost',v);
+  $$('.extab',v).forEach(b=>b.onclick=()=>{$$('.extab',v).forEach(x=>x.setAttribute('aria-selected',x===b));showEx(sec,+b.dataset.k,host);});
+  v._open=()=>{if(!host.firstChild)$$('.extab',v)[0].click();};
+  return v;
+}
+const app=$('#app'),tabs=$('#tabs');
+function go(id){
+  $$('.tab',tabs).forEach(t=>t.setAttribute('aria-selected',t.dataset.id===id));
+  $$('.view',app).forEach(v=>{v.hidden=v.id!=='v-'+id;if(!v.hidden&&v._open)v._open();});
+  clearPen();
+}
+function init(){
+  const all=[window.THEORY].concat(window.SECTIONS);
+  all.forEach((s,i)=>{
+    const b=document.createElement('button');b.className='tab';b.dataset.id=s.id;b.type='button';b.setAttribute('role','tab');b.style.setProperty('--c',s.color);
+    b.innerHTML=`<i>${i===0?'?':i}</i>${s.tab}<span class="done"></span>`;b.onclick=()=>go(s.id);tabs.appendChild(b);
+    app.appendChild(s.id==='nazariya'?window.buildTheory():buildSec(s));
+  });
+  updProg();
+  const h=(location.hash||'').slice(1);go(all.some(s=>s.id===h)?h:'nazariya');
+}
+window.addEventListener('load',init);
+
+/* ---------- qalam va shrift ---------- */
+const cv=$('#pen'),cx=cv.getContext('2d'),pt=$('#pentools');let pc='#2f80ff',drawing=false,penOn=false;
+function sizePen(){const w=$('#wrap'),r=window.devicePixelRatio||1;cv.style.width=w.scrollWidth+'px';cv.style.height=w.scrollHeight+'px';cv.width=w.scrollWidth*r;cv.height=w.scrollHeight*r;cx.setTransform(r,0,0,r,0,0);cx.lineCap='round';cx.lineJoin='round';}
+function clearPen(){if(penOn){sizePen();}}
+function setPen(on){penOn=on;cv.classList.toggle('on',on);pt.classList.toggle('on',on);$('#penBtn').setAttribute('aria-pressed',on);if(on)sizePen();}
+$('#penBtn').onclick=()=>setPen(!penOn);$('#penOff').onclick=()=>setPen(false);$('#penClear').onclick=()=>sizePen();
+$$('.sw',pt).forEach(b=>b.onclick=()=>{pc=b.dataset.c;$$('.sw',pt).forEach(x=>x.setAttribute('aria-pressed',x===b));});
+const pos=e=>{const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];};
+cv.onpointerdown=e=>{drawing=true;cv.setPointerCapture(e.pointerId);const [x,y]=pos(e);cx.strokeStyle=pc;cx.lineWidth=5;cx.beginPath();cx.moveTo(x,y);cx.lineTo(x+.1,y+.1);cx.stroke();};
+cv.onpointermove=e=>{if(!drawing)return;const [x,y]=pos(e);cx.lineTo(x,y);cx.stroke();};
+cv.onpointerup=cv.onpointercancel=()=>{drawing=false;};
+$('#bigBtn').onclick=e=>{const b=document.documentElement.classList.toggle('big');e.currentTarget.setAttribute('aria-pressed',b);if(penOn)sizePen();};
+})();
+</script>
+<script>
+(function(){
+const ring=(k,cx,cy,r,off)=>{const a=(-90+360/k*off)*Math.PI/180;return [Math.round(cx+r*Math.cos(a)),Math.round(cy+r*Math.sin(a))];};
+const pent=(i,r)=>ring(5,300,205,r||150,i);
+const L=['A','B','C','D','E','F','G'];
+
+/* Hayotiy misollar uchun graflar */
+const LIFE={
+  metro:{title:`🚇 Metro sxemasi`,g:{alt:`Metro sxemasi`,n:[[`Bekat 1`,80,200,'🚉'],[`Bekat 2`,220,80,'🚉'],[`Bekat 3`,220,320,'🚉'],[`Bekat 4`,380,80,'🚉'],[`Bekat 5`,380,320,'🚉'],[`Bekat 6`,530,200,'🚉']],e:[[0,1],[0,2],[1,3],[2,4],[3,5],[4,5],[1,2],[3,4]]},why:`Metro bekatlari — uchlar (6 ta), ular orasidagi yo'llar — qirralar (8 ta). Yo'lovchi bir bekatdan ikkinchisiga faqat chiziqlar bo'ylab o'tadi.`},
+  ijtimoiy:{title:`📱 Ijtimoiy tarmoq`,g:{alt:`Ijtimoiy tarmoq do'stlik grafi`,n:[[`Ali`,150,90,'👦'],[`Vali`,420,90,'🧒'],[`Gul`,420,300,'👧'],[`Zebo`,150,300,'👩'],[`Dilnoza`,285,195,'👩‍🦰']],e:[[0,1],[0,3],[1,2],[2,3],[1,4],[2,4]]},why:`Har bir odam — uch (5 ta), do'stlik — qirra (6 ta). Dilnoza 3 kishi bilan do'st, Zebo esa 2 kishi bilan.`},
+  navigator:{title:`🗺️ Navigator`,g:{alt:`Navigator yo'llari`,n:[[`Uy`,80,200,'🏠'],[`Chorraha A`,230,100,'🚦'],[`Chorraha B`,230,300,'🚦'],[`Maktab`,400,180,'🏫'],[`Ish`,510,80,'🏢']],e:[[0,1,3],[0,2,5],[1,2,2],[1,3,4],[2,3,7],[3,4,2]]},why:`Chorrahalar — uchlar (5 ta), ko'chalar — qirralar (6 ta). Qirra ustidagi son — masofa (km). Navigator eng qisqa yo'lni shu sonlar bo'yicha topadi.`},
+  avia:{title:`✈️ Aviareyslar`,g:{alt:`Aviareyslar grafi`,n:[[`Toshkent`,200,200,'🛫'],[`Moskva`,80,80,'✈️'],[`Dubay`,80,320,'✈️'],[`Istanbul`,350,120,'✈️'],[`London`,500,200,'✈️'],[`Dehli`,350,300,'✈️']],e:[[0,1],[0,2],[0,3],[3,4],[3,5],[2,5]]},why:`Shaharlar — uchlar (6 ta), reyslar — qirralar (6 ta). Toshkent eng ko'p reysga ega — uning darajasi 3.`},
+  internet:{title:`🌐 Internet`,g:{alt:`Internet tarmog'i`,n:[[`Router`,300,80,'📡'],[`Kompyuter 1`,100,220,'💻'],[`Kompyuter 2`,250,320,'💻'],[`Kompyuter 3`,400,320,'💻'],[`Telefon`,520,220,'📱']],e:[[0,1],[0,2],[0,3],[0,4],[1,2],[3,4]]},why:`Qurilmalar — uchlar (5 ta), simlar/wi-fi — qirralar (6 ta). Router hammaga ulangan, shuning uchun uning darajasi 4.`},
+  molekula:{title:`🧪 Molekula`,g:{alt:`Molekula grafi`,n:[[`C`,300,200,'⚫'],[`H`,160,120,'⚪'],[`H`,440,120,'⚪'],[`H`,160,300,'⚪'],[`H`,440,300,'⚪'],[`O`,300,50,'🔴']],e:[[0,1],[0,2],[0,3],[0,4],[0,5]]},why:`Atomlar — uchlar (6 ta), kimyoviy bog'lar — qirralar (5 ta). Uglerod atomi (C) markazda, unga 5 ta atom bog'langan — darajasi 5.`}
+};
+
+const KEN={alt:`Kenigsberg ko'priklari grafi`,n:[['A',300,60],['B',300,200],['C',300,340],['D',500,200]],e:[[0,1],[0,1],[2,1],[2,1],[0,3],[2,3],[1,3]]};
+
+window.SECTIONS=[
+/* ============ 1. TURLARI ============ */
+{id:'turlar',tab:`Graf turlari`,color:'#e63946',mode:'quiz',title:`1. Graflarning turlarini ajrating`,
+ intro:`Graflar bir-biridan qirralarining ko'rinishi va uchlarining bog'lanishi bilan farq qiladi. Chizmaga qarang va turini toping.`,
+ rule:`<b>To'liq graf:</b> har ikki uch tutashgan. <b>Yo'naltirilgan:</b> qirralarda o'q bor. <b>Vaznli:</b> qirralarda son bor. <b>Bog'langan:</b> hamma uchga yetib borish mumkin. <b>Bog'lanmagan:</b> bir necha alohida bo'lak (komponenta) bor. <b>Xalqa:</b> uchdan chiqib, o'ziga qaytadigan qirra.`,
+ exs:[
+ {title:`To'rt do'st`,story:`Ali, Vali, Gul va Zebo bir sinfda o'qiydi. Hamma bir-birini taniydi. Tanishlik chiziq bilan ko'rsatilgan.`,task:`Bu qanday graf?`,
+  g:{alt:`To'rt do'st grafi`,n:[[`Ali`,150,90,'👦'],[`Vali`,450,90,'🧒'],[`Gul`,450,310,'👧'],[`Zebo`,150,310,'👩']],e:[[0,1],[1,2],[2,3],[3,0],[0,2],[1,3]]},
+  opts:[`Daraxt (sikli yo'q bog'langan graf)`,`To'liq graf (har ikki uch tutashgan)`,`Yo'naltirilgan graf`,`Bog'lanmagan graf`],ans:1,
+  why:`4 ta uchning har biri qolgan 3 tasi bilan tutashgan. Qirralar soni 4·3 : 2 = 6.`,hint:`Har bir uchdan nechta chiziq chiqayotganini sanang. Hamma bilan tutashganmi?`,
+  steps:`<p>1) Uchlar: 4 ta.</p><p>2) Har bir uchdan 3 tadan chiziq chiqadi, ya'ni u hamma boshqa uchlar bilan tutashgan.</p><p>3) Demak, bu <b>to'liq graf</b>. Qirralar: 4·3 : 2 = 6.</p>`},
+ {title:`Bir tomonlama ko'chalar`,story:`Shaharchada ba'zi ko'chalarda faqat bir tomonga yurish mumkin. O'q harakat yo'nalishini ko'rsatadi.`,task:`Bu qanday graf?`,
+  g:{alt:`Bir tomonlama ko'chalar grafi`,dir:true,n:[[`Uy`,110,200,'🏠'],[`Maktab`,300,80,'🏫'],[`Do'kon`,300,320,'🏪'],[`Stadion`,490,200,'⚽']],e:[[0,2],[2,1],[1,0],[1,3]]},
+  opts:[`Yo'nalishsiz graf`,`Yo'naltirilgan graf (qirralarda o'q bor)`,`Vaznli graf (qirralarda son bor)`,`To'liq graf`],ans:1,
+  why:`Qirralar o'qli: Uydan Do'konga, Do'kondan Maktabga boriladi. Stadiondan esa hech qayerga yo'l yo'q.`,hint:`Qirralarning uchida o'q bormi yoki son yozilganmi?`,
+  steps:`<p>1) Qirralarda o'q bor: harakat faqat bir tomonga.</p><p>2) Shuning uchun graf <b>yo'naltirilgan</b>.</p><p>3) Yo'l: Uy → Do'kon → Maktab → Uy yoki Maktab → Stadion.</p>`},
+ {title:`Yuk tashish korxonasi`,story:`Korxona shu yo'nalishlarda ishlaydi: Toshkent–Nukus, Toshkent–Urganch, Toshkent–Qarshi, Toshkent–Samarqand, Toshkent–Farg'ona, Buxoro–Navoiy, Buxoro–Termiz.`,task:`Bu qanday graf? Ulug'bek Toshkentdan Buxoroga yuk jo'nata oladimi?`,
+  g:{alt:`Yuk tashish yo'nalishlari`,n:[[`Toshkent`,200,200,'🏙️'],[`Nukus`,90,70],[`Urganch`,290,70],[`Qarshi`,90,330],[`Samarqand`,290,330],[`Farg'ona`,60,200],[`Buxoro`,470,200,'🕌'],[`Navoiy`,545,80],[`Termiz`,545,320]],e:[[0,1],[0,2],[0,3],[0,4],[0,5],[6,7],[6,8]]},
+  opts:[`To'liq graf`,`Yo'naltirilgan graf`,`Bog'lanmagan graf (2 ta bo'lak)`,`Vaznli graf`],ans:2,
+  why:`Graf ikki alohida bo'lakdan iborat: Toshkent guruhi va Buxoro guruhi. Ularni bog'lovchi yo'l yo'q, shuning uchun yuk jo'natib bo'lmaydi.`,hint:`Toshkentdan chiziqlar bo'ylab Buxoroga yetib bora olasizmi?`,
+  steps:`<p>1) Toshkentdan boriladigan shaharlar: Nukus, Urganch, Qarshi, Samarqand, Farg'ona.</p><p>2) Buxorodan: Navoiy, Termiz.</p><p>3) Ikki guruh orasida chiziq yo'q: graf <b>bog'lanmagan</b>, 2 ta komponenta bor.</p>`},
+ {title:`Xalqali graf`,story:`Ba'zi yo'llar odamni o'z uyiga qaytaradi. Masalan, aylana yo'l: A dan chiqib yana A ga qaytish mumkin. Bunday qirra xalqa deb ataladi. Rasmda A uchida xalqa bor, hamda A–B–C–A sikli bor.`,task:`A uchining darajasi nechaga teng? (Xalqani hisobga oling!)`,
+  g:{alt:`Xalqali graf`,n:[['A',180,200],['B',420,120],['C',420,300]],e:[[0,0],[0,1],[1,2],[2,0]]},
+  opts:[`2 ta — xalqa darajaga qo'shilmaydi`,`3 ta — xalqa bitta qirra deb sanaladi`,`4 ta — xalqa chiqish va kirish sifatida 2 qo'shadi`,`5 ta`],ans:2,
+  why:`A uchida 1 ta xalqa (A–A) va 2 ta oddiy qirra (A–B, A–C) bor. Xalqa darajaga 2 qo'shadi: chiqish + kirish. Demak, A darajasi = 1 + 1 + 2 = 4.`,hint:`Xalqa — bu uchdan chiqib, yana o'sha uchga qaytadigan qirra. U darajaga 2 qo'shadi.`,
+  steps:`<p>1) A uchining qirralari: A–B, A–C, va xalqa A–A.</p><p>2) Xalqa darajaga 2 qo'shadi: chiqish + kirish.</p><p>3) A darajasi: 1 (AB) + 1 (AC) + 2 (xalqa) = <b>4</b>.</p><p>4) B va C darajalari 2 tadan. Tekshiruv: 4+2+2 = 8 = 2·4 (qirralar 4 ta).</p>`}
+ ]},
+
+/* ============ 2. SANASH ============ */
+{id:'sanash',tab:`Uch va qirralar`,color:'#c2410c',mode:'count',title:`2. Uchlar, qirralar va darajalarni sanang`,
+ intro:`Uch deb nuqtalarni, qirra deb chiziqlarni aytamiz. Uchning darajasi shu uchdan chiqqan qirralar soniga teng.`,
+ rule:`<b>Tekshiring:</b> hamma uchlarning darajalari yig'indisi qirralar sonining ikki baravariga teng. Toq uchlar soni doim juft bo'ladi.`,
+ exs:[
+ {title:`Uch qishloq`,story:`A, B va C qishloqlar orasida yo'llar bor.`,task:`Uchlar, qirralar va toq uchlar sonini toping.`,
+  g:{alt:`Uch qishloq grafi`,n:[['A',110,260,'🏡'],['B',300,110,'🏡'],['C',490,260,'🏡']],e:[[0,1],[1,2]]},
+  steps:`<p>Uchlar: A, B, C. Jami 3 ta.</p><p>Qirralar: A–B va B–C. Jami 2 ta.</p><p>Darajalar: A 1, B 2, C 1. Toq uchlar: A va C, ya'ni 2 ta.</p><p>Tekshiruv: 1+2+1 = 4 = 2·2.</p>`},
+ {title:`Kvadrat va diagonal`,story:`To'rtta shahar kvadrat shaklida yo'llar bilan bog'langan. Qo'shimcha yo'l B va D shaharlarni tutashtiradi.`,task:`Uchlar, qirralar va toq uchlar sonini toping.`,
+  g:{alt:`Kvadrat va diagonal`,n:[['A',150,90],['B',450,90],['C',450,310],['D',150,310]],e:[[0,1],[1,2],[2,3],[3,0],[1,3]]},
+  steps:`<p>Uchlar: A, B, C, D = 4 ta.</p><p>Qirralar: AB, BC, CD, DA, BD = 5 ta.</p><p>Darajalar: A 2, B 3, C 2, D 3. Toq uchlar: B va D = 2 ta.</p><p>Tekshiruv: 2+3+2+3 = 10 = 2·5.</p>`},
+ {title:`Besh uchli graf`,story:`Beshta uchli graf: beshburchak va uchta qo'shimcha chiziq.`,task:`Hammasini ehtiyotkorlik bilan sanang: darajalarni ko'rsatish tugmasi yordam beradi.`,
+  g:{alt:`Besh uchli graf`,n:[0,1,2,3,4].map(i=>[L[i],...pent(i)]),e:[[0,1],[1,2],[2,3],[3,4],[4,0],[0,2],[0,3],[1,3]]},
+  steps:`<p>Uchlar: A, B, C, D, E = 5 ta.</p><p>Qirralar: AB, BC, CD, DE, EA, AC, AD, BD = 8 ta.</p><p>Darajalar: A 4, B 3, C 3, D 4, E 2. Toq uchlar: B va C = 2 ta.</p><p>Tekshiruv: 4+3+3+4+2 = 16 = 2·8.</p>`}
+ ]},
+
+/* ============ 3. MATRITSA ============ */
+{id:'matritsa',tab:`Matritsa`,color:'#7c3aed',mode:'matrix',title:`3. Graf bo'yicha matritsa tuzing`,
+ intro:`Qo'shnilik matritsasi grafni jadval ko'rinishida yozish usuli. Kompyuter graflarni aynan shunday saqlaydi.`,
+ rule:`Qator va ustun uchlarni bildiradi. Ikki uch orasida qirra bo'lsa 1, bo'lmasa 0 yozamiz. Katakchani bossangiz, chizmada mos uchlar yonadi. <b>Matritsa nima uchun kerak?</b> Kompyuter graflarni matritsada saqlaydi va tez hisoblaydi: eng qisqa yo'l (navigator), do'stlar tavsiyasi (ijtimoiy tarmoq), tarmoq uzilishini tekshirish, aviareys jadvali — bularning barchasi matritsa ustida amallar orqali ishlaydi.`,
+ exs:[
+ {title:`Ikki do'kon`,story:`Uy va maktab bitta yo'l bilan tutashgan.`,task:`2×2 matritsani to'ldiring.`,
+  g:{alt:`Ikki uchli graf`,n:[['A',150,200,'🏠'],['B',450,200,'🏫']],e:[[0,1]]},
+  rule:`Qator va ustun uchlarni bildiradi. Ikki uch orasida qirra bo'lsa 1, bo'lmasa 0 yozamiz. Uchning o'zi bilan o'zi orasi 0.`,
+  why:`Qirra bitta: A–B. Shuning uchun A qatori B ustunida va B qatori A ustunida 1 turadi. Qolganlari 0.`,
+  steps:`<p>Matritsa:</p><p><b>A: 0 1</b></p><p><b>B: 1 0</b></p><p>Diagonal nollardan iborat: uch o'zi bilan tutashmagan.</p>`},
+ {title:`Uch shahar zanjiri`,story:`A va B, shuningdek B va C shaharlar yo'l bilan tutashgan. A va C o'rtasida yo'l yo'q.`,task:`3×3 matritsani to'ldiring.`,
+  g:{alt:`Uch uchli zanjir`,n:[['A',100,300],['B',300,110],['C',500,300]],e:[[0,1],[1,2]]},
+  rule:`Qirra bo'lsa 1, bo'lmasa 0. Yo'nalishsiz grafda matritsa diagonalga nisbatan simmetrik: A–B bo'lsa, B–A ham bor.`,
+  why:`Qator yig'indisi uchning darajasini beradi: A 1, B 2, C 1.`,
+  steps:`<p>A: 0 1 0</p><p>B: 1 0 1</p><p>C: 0 1 0</p><p>Qator yig'indilari 1, 2, 1: bular uchlarning darajalari.</p>`},
+ {title:`Bir tomonlama yo'llar`,story:`Uchta shahar orasida faqat bir tomonlama yo'llar bor: A→B, B→C, C→A va A→C.`,task:`3×3 matritsani to'ldiring. Qator: qayerdan, ustun: qayerga.`,
+  g:{alt:`Yo'naltirilgan uchburchak`,dir:true,n:[['A',300,80],['B',480,320],['C',120,320]],e:[[0,1],[1,2],[2,0],[0,2]]},
+  rule:`Yo'naltirilgan grafda qator: o'q qayerdan chiqadi, ustun: qayerga kiradi. A→B bo'lsa, A qatori va B ustuniga 1 yoziladi.`,
+  why:`Matritsa endi simmetrik emas: A→B bor, lekin B→A yo'q. Qator yig'indisi uchdan chiqadigan o'qlar sonini beradi: A 2, B 1, C 1.`,
+  steps:`<p>A: 0 1 1 (A→B, A→C)</p><p>B: 0 0 1 (B→C)</p><p>C: 1 0 0 (C→A)</p>`}
+ ]},
+
+/* ============ 4. EYLER ============ */
+{id:'eyler',tab:`Qalamni uzmay`,color:'#0b7a5c',mode:'eyler',title:`4. Grafni qalamni uzmasdan chizing`,
+ intro:`Shaklni qalamni qog'ozdan ko'tarmay va bir chiziqdan ikki marta yurmay chizish mumkinmi? Uchlarni ketma-ket bosib yuring.`,
+ rule:`<b>Eyler yo'li qoidasi:</b> toq darajali uchlar soni nechta bo'lishiga qarab hal qilinadi. Quyidagi jadvalga qarang.`,
+ exs:[
+ {title:`Besh qirrali yulduz`,story:`Yulduzni qalamni uzmay chizing.`,task:`Uchlarni ketma-ket bosib, hamma chiziqdan bir martadan o'ting.`,
+  g:{alt:`Yulduz`,n:[0,1,2,3,4].map(i=>[L[i],...pent(i,155)]),e:[[0,2],[2,4],[4,1],[1,3],[3,0]]},
+  why:`Hamma uchlarning darajasi 2 (juft), shuning uchun istalgan uchdan boshlab, o'sha uchda tugatiladi.`,
+  steps:`<p>Har bir uchdan 2 tadan chiziq chiqadi: hamma uchlar juft.</p><p>Yo'l: A → C → E → B → D → A.</p>`},
+ {title:`Konvert`,story:`Uy shaklidagi konvertni qalamni uzmay chizing. Ikki diagonali ham bor.`,task:`Qaysi uchdan boshlash kerakligini toping. Toq uchlarni ko'rsating.`,
+  g:{alt:`Konvert shakli`,n:[['A',150,330],['B',450,330],['C',450,190],['D',150,190],['E',300,70]],e:[[0,1],[1,2],[2,3],[3,0],[3,4],[4,2],[0,2],[1,3]]},
+  why:`Faqat 2 ta toq uch bor: A va B. Toq uchdan boshlab, ikkinchi toq uchda tugatdingiz.`,
+  steps:`<p>Darajalar: A 3, B 3, C 4, D 4, E 2.</p><p>Toq uchlar: A va B. A dan boshlaymiz.</p><p>Yo'l: A → B → C → D → A → C → E → D → B.</p>`},
+ {title:`Kenigsberg ko'priklari`,story:`Kenigsbergda daryo ustida 7 ta ko'prik bor. Hamma ko'prikdan bir martadan o'tib, yurishni boshlagan joyga qaytish mumkinmi? Buni 1736-yilda Eyler hal qilgan.`,task:`Urinib ko'ring. Mumkin bo'lmasa, "chizib bo'lmaydi" tugmasini bosing.`,
+  g:{...KEN},
+  why:`To'rttala uchning darajasi toq: A 3, B 5, C 3, D 3. Toq uchlar 4 ta, shuning uchun mumkin emas.`,
+  steps:`<p>Darajalar: A 3, B 5, C 3, D 3.</p><p>Toq uchlar 4 ta. Eyler qoidasiga ko'ra, 2 tadan ko'p bo'lsa, chizib bo'lmaydi.</p>`}
+ ]},
+
+/* ============ 5. ENG QISQA ============ */
+{id:'qisqa',tab:`Eng qisqa yo'l`,color:'#c2255c',mode:'qisqa',title:`5. Eng qisqa yo'lni toping`,
+ intro:`Qirra ustidagi son masofani (yoki narxni) bildiradi. Eng qisqa yo'l eng kam qirrali yo'l emas, qirralar yig'indisi eng kichik bo'lgan yo'ldir.`,
+ rule:`<b>Usul:</b> boshlanishdan eng yaqin uchni tanlang, uning qo'shnilariga masofani yangilang va shunday davom eting. Navigator ham shunday ishlaydi.`,
+ exs:[
+ {title:`Uydan maktabga`,story:`Uydan (A) maktabga (D) bir nechta yo'l bor. Sonlar kilometr.`,task:`A dan D gacha eng qisqa yo'lni toping.`,unit:`km`,from:0,to:3,
+  g:{alt:`Uydan maktabga yo'llar`,n:[['A',80,200,'🏠'],['B',260,85],['C',260,315],['D',520,200,'🏫']],e:[[0,1,2],[0,2,4],[1,2,1],[1,3,7],[2,3,3]]},
+  why:`A–B–C–D: 2+1+3 = 6 km. To'g'ridan ko'ringan yo'llar uzunroq.`},
+ {title:`Besh shahar`,story:`A, B, C, D, E shaharlar orasidagi masofalar kilometrda berilgan.`,task:`A dan E gacha eng qisqa yo'lni toping.`,unit:`km`,from:0,to:4,
+  g:{alt:`Besh shahar orasidagi masofalar`,n:[['A',70,200],['B',230,80],['C',230,320],['D',410,100],['E',540,230]],e:[[0,1,4],[0,2,2],[1,2,1],[1,3,5],[2,3,8],[2,4,10],[3,4,2]]},
+  why:`A–C–B–D–E: 2+1+5+2 = 10 km. Eng kam qirrali A–C–E yo'li esa 12 km.`},
+ {title:`Yetti qishloq`,story:`Qishloqlar orasida avtobus qatnaydi. Chiptaning narxi ming so'mda yozilgan.`,task:`A dan F gacha eng arzon yo'lni toping.`,unit:`ming so'm`,from:0,to:5,
+  g:{alt:`Yetti qishloq orasidagi narxlar`,n:[['A',50,200],['B',170,70],['C',170,330],['D',340,90],['E',340,310],['F',550,200],['G',450,50]],e:[[0,1,4],[0,2,3],[1,2,2],[1,3,6],[2,4,5],[3,4,1],[3,5,4],[4,5,6],[3,6,3],[6,5,2]]},
+  why:`A–C–E–D–F: 3+5+1+4 = 13 ming so'm.`}
+ ]},
+
+/* ============ 6. YO'L BORMI ============ */
+{id:'yol',tab:`Yo'l bormi?`,color:'#0a6e94',mode:'yol',title:`6. Bir uchdan ikkinchisiga borish mumkinmi?`,
+ intro:`Graf bog'langan bo'lsa, istalgan uchdan istalgan uchga borish mumkin. Bog'lanmagan grafda bir necha alohida bo'lak, ya'ni komponenta bo'ladi.`,
+ rule:`<b>Maslahat:</b> boshlang'ich uchdan chiziqlar bo'ylab borish mumkin bo'lgan hamma uchlarni belgilang. Manzil belgilanmasa, yo'l yo'q.`,
+ exs:[
+ {title:`Oltita qishloq`,story:`Qishloqlar orasida avtobus qatnaydi: A–B, B–E, E–F va C–D.`,task:`A qishloqdan F qishloqqa borish mumkinmi?`,from:0,to:5,
+  g:{alt:`Oltita qishloq`,n:[['A',70,110,'🏘️'],['B',230,110,'🏘️'],['C',400,110,'🏘️'],['D',540,110,'🏘️'],['E',230,290,'🏘️'],['F',400,290,'🏘️']],e:[[0,1],[1,4],[4,5],[2,3]]},
+  why:`A dan B ga, B dan E ga, E dan F ga boriladi.`,
+  steps:`<p>A dan boshlaymiz: A → B.</p><p>B dan: E.</p><p>E dan: F. Manzilga yetdik.</p><p>C va D esa alohida bo'lak.</p>`},
+ {title:`Sayyoralar (ichma-ich)`,story:`Rasmda sayyoralar orasidagi yo'llar ichma-ich joylashgan halqalar ko'rinishida. Tashqi halqada: Yer, Merkuriy, Venera, Pluton. Ichki halqada: Mars, Uran, Neptun, Saturn, Yupiter. Ikki halqa orasida bog'lanish yo'q.`,task:`Yerdan Marsga borish mumkinmi?`,from:0,to:8,
+  g:(()=>{
+    const outer=[[`Yer`,100,200,'🌍'],[`Merkuriy`,200,80,'⚪'],[`Venera`,200,320,'🟡'],[`Pluton`,80,320,'⚫']];
+    const inner=[[`Mars`,380,200,'🔴'],[`Uran`,470,110,'🔵'],[`Neptun`,540,200,'🌀'],[`Saturn`,490,300,'🪐'],[`Yupiter`,380,300,'🟠']];
+    const n=[...outer,...inner];
+    const e=[[0,1],[1,2],[2,3],[3,0],[1,3], [4,5],[5,6],[6,7],[7,8],[8,4],[4,6]];
+    return {alt:`Ichma-ich halqali sayyoralar grafi`,n,e};
+  })(),
+  why:`Tashqi halqada Yer, Merkuriy, Venera, Pluton; ichki halqada Mars, Uran, Neptun, Saturn, Yupiter. Ikki halqa orasida hech qanday yo'l yo'q — ular alohida komponentlar.`,
+  steps:`<p>1) Tashqi halqa: Yer → Merkuriy → Venera → Pluton → Yer. Yana Merkuriy → Pluton.</p><p>2) Ichki halqa: Mars → Uran → Neptun → Saturn → Yupiter → Mars. Yana Mars → Neptun.</p><p>3) Ikki halqani bog'lovchi qirra yo'q. Demak, Yer va Mars turli komponentlarda: yo'l yo'q.</p>`},
+ {title:`Raqamlar mamlakati`,story:`Mamlakatda 1 dan 9 gacha raqamlangan shaharlar bor. Ikki shaharning raqamidan tuzilgan ikki xonali son 3 ga bo'linsa, ular orasida aviareys bor (masalan, 12, 15, 18).`,task:`1-shahardan 9-shaharga borish mumkinmi?`,from:0,to:8,
+  g:(()=>{const n=[],e=[];for(let i=1;i<=9;i++){const p=ring(9,300,200,150,i-1);n.push([String(i),p[0],p[1]]);}
+    for(let a=1;a<=9;a++)for(let b=a+1;b<=9;b++)if((a+b)%3===0)e.push([a-1,b-1]);return {alt:`Raqamlar mamlakati`,n,e};})(),
+  why:`9-shahar faqat 3 va 6 bilan bog'langan. 3, 6, 9 alohida bo'lak, 1 esa boshqa guruhda.`,
+  steps:`<p>Son 3 ga bo'linadi, agar raqamlar yig'indisi 3 ga bo'linsa.</p><p>Aviareyslar: 1–2, 1–5, 1–8, 2–4, 2–7, 4–5, 4–8, 5–7, 7–8 va 3–6, 3–9, 6–9.</p><p>1 dan boriladi: 2, 5, 8, 4, 7. Ular orasida 3, 6, 9 yo'q.</p><p>9 faqat 3 va 6 bilan bog'langan: yo'l yo'q.</p>`}
+ ]}
+];
+
+/* ============ NAZARIYA ============ */
+window.THEORY={id:'nazariya',tab:`Nazariya`,color:'#1b5fd1'};
+const T1={alt:`To'rt uchli graf`,n:[['A',140,90],['B',460,90],['C',460,310],['D',140,310]],e:[[0,1],[1,2],[2,3],[3,0],[1,3]]};
+
+/* Kenigsberg - kichraytirilgan (boshqa rasmlarga mos) */
+const SVGMAP=`<svg viewBox="0 0 600 320" role="img" aria-label="Kenigsberg xaritasi: daryo, ikki orol, qirg'oqlar va yetti ko'prik">
+<rect width="600" height="320" fill="#a8d8f0"/>
+<!-- Shimoliy qirg'oq (A) -->
+<path d="M0,0 H600 V82 Q525,70 450,82 Q375,94 300,82 Q225,70 150,82 Q75,94 0,82 Z" fill="#9acd6b" stroke="#1b2559" stroke-width="2.5"/>
+<!-- Janubiy qirg'oq (C) -->
+<path d="M0,238 Q75,226 150,238 Q225,250 300,238 Q375,226 450,238 Q525,250 600,238 V320 H0 Z" fill="#9acd6b" stroke="#1b2559" stroke-width="2.5"/>
+<!-- G'arbiy orol (B) -->
+<ellipse cx="185" cy="160" rx="105" ry="42" fill="#e6c76a" stroke="#1b2559" stroke-width="2.5"/>
+<!-- Sharqiy orol (D) -->
+<ellipse cx="435" cy="160" rx="78" ry="42" fill="#e6c76a" stroke="#1b2559" stroke-width="2.5"/>
+<!-- Uylar/binolar -->
+<g font-size="15"><text x="30" y="40">🏘️</text><text x="165" y="40">🏰</text><text x="295" y="40">🏘️</text><text x="425" y="40">⛪</text><text x="545" y="40">🏘️</text>
+<text x="30" y="305">🏘️</text><text x="165" y="305">🏘️</text><text x="295" y="305">🏭</text><text x="425" y="305">🏘️</text><text x="545" y="305">🏘️</text></g>
+<!-- Ko'priklar (7 ta): a, b, c, d, e, f, g -->
+<g fill="#c98a3f" stroke="#1b2559" stroke-width="2.5">
+  <rect x="125" y="80" width="16" height="40" rx="3"/>
+  <rect x="225" y="80" width="16" height="40" rx="3"/>
+  <rect x="125" y="200" width="16" height="40" rx="3"/>
+  <rect x="225" y="200" width="16" height="40" rx="3"/>
+  <rect x="425" y="80" width="16" height="40" rx="3"/>
+  <rect x="425" y="200" width="16" height="40" rx="3"/>
+  <rect x="290" y="152" width="65" height="16" rx="3"/>
+</g>
+<!-- Ko'prik nomlari -->
+<g font-family="Fredoka,sans-serif" font-weight="700" font-size="12" fill="#1b2559">
+  <text x="133" y="103">a</text><text x="233" y="103">b</text>
+  <text x="133" y="223">c</text><text x="233" y="223">d</text>
+  <text x="433" y="103">e</text><text x="433" y="223">f</text>
+  <text x="322" y="150">g</text>
+</g>
+<!-- Uchlar (hududlar) -->
+<g font-family="Fredoka,sans-serif" font-weight="700" font-size="18" fill="#1b2559" text-anchor="middle">
+  <circle cx="300" cy="48" r="15" fill="#ff7b7b" stroke="#1b2559" stroke-width="2.5"/><text x="300" y="55">A</text>
+  <circle cx="185" cy="160" r="15" fill="#ffd25c" stroke="#1b2559" stroke-width="2.5"/><text x="185" y="167">B</text>
+  <circle cx="435" cy="160" r="15" fill="#6db3ff" stroke="#1b2559" stroke-width="2.5"/><text x="435" y="167">D</text>
+  <circle cx="300" cy="272" r="15" fill="#5fd8c7" stroke="#1b2559" stroke-width="2.5"/><text x="300" y="279">C</text>
+</g>
+<!-- Suv to'lqinlari -->
+<text x="70" y="170" font-size="16" opacity=".6">🌊</text><text x="525" y="195" font-size="16" opacity=".6">🌊</text>
+</svg>`;
+
+/* Eyler qoidalari uchun kichik graflar */
+/* 0 ta toq uch: beshburchak (C5) - hamma daraja 2 (juft) */
+const EG0=(()=>{const n=[],e=[];for(let i=0;i<5;i++){const p=ring(5,300,200,120,i);n.push([L[i],p[0],p[1]]);}
+  for(let i=0;i<5;i++)e.push([i,(i+1)%5]);return {alt:`0 ta toq uch: beshburchak, hamma daraja juft`,n,e};})();
+/* 2 ta toq uch: A va D toq (3,3), B va C juft (2,2) */
+const EG2={alt:`2 ta toq uch: A va D`,n:[['A',90,200],['B',280,90],['C',480,200],['D',280,310]],e:[[0,1],[1,2],[2,3],[3,1],[0,3]]};
+/* 4 ta toq uch: Kenigsberg */
+const EG4={alt:`4 ta toq uch: hammasi toq`,n:[['A',300,60],['B',300,200],['C',300,340],['D',500,200]],e:[[0,1],[0,1],[2,1],[2,1],[0,3],[2,3],[1,3]]};
+
+/* Matematik belgilash rasmi (shrift kichraytirilgan) */
+const SVGMATH=`<svg viewBox="0 0 600 260" role="img" aria-label="Grafning matematik belgilanishi">
+<rect width="600" height="260" fill="#f8fbff" rx="10"/>
+<text x="24" y="32" font-family="Fredoka,sans-serif" font-weight="700" font-size="20" fill="#1b2559">G = (V, E)</text>
+<line x1="24" y1="44" x2="576" y2="44" stroke="#cfe2fb" stroke-width="1.5"/>
+<text x="24" y="68" font-family="Nunito,sans-serif" font-weight="800" font-size="12" fill="#4a5688">G — graf</text>
+<text x="150" y="68" font-family="Nunito,sans-serif" font-weight="800" font-size="12" fill="#4a5688">V — uchlar to'plami</text>
+<text x="330" y="68" font-family="Nunito,sans-serif" font-weight="800" font-size="12" fill="#4a5688">E — qirralar to'plami</text>
+<text x="24" y="100" font-family="Fredoka,sans-serif" font-weight="700" font-size="16" fill="#1c6ef2">V = {A, B, C, D}</text>
+<text x="24" y="120" font-family="Nunito,sans-serif" font-size="11" fill="#4a5688">|V| = 4 — 4 ta uch bor</text>
+<text x="24" y="152" font-family="Fredoka,sans-serif" font-weight="700" font-size="16" fill="#0b7a5c">E = {AB, AC, BC, CD}</text>
+<text x="24" y="172" font-family="Nunito,sans-serif" font-size="11" fill="#4a5688">|E| = 4 — 4 ta qirra bor</text>
+<text x="24" y="205" font-family="Nunito,sans-serif" font-size="11" fill="#4a5688">Qirra ikki uchni bog'laydi: AB → A va B uchlari.</text>
+<!-- Chizma qismi (o'ngda) -->
+<g transform="translate(390,85)">
+  <circle cx="30" cy="30" r="18" fill="#ff7b7b" stroke="#1b2559" stroke-width="2.5"/><text x="30" y="37" font-family="Fredoka,sans-serif" font-weight="700" font-size="15" fill="#1b2559" text-anchor="middle">A</text>
+  <circle cx="140" cy="30" r="18" fill="#ffd25c" stroke="#1b2559" stroke-width="2.5"/><text x="140" y="37" font-family="Fredoka,sans-serif" font-weight="700" font-size="15" fill="#1b2559" text-anchor="middle">B</text>
+  <circle cx="30" cy="130" r="18" fill="#5fd8c7" stroke="#1b2559" stroke-width="2.5"/><text x="30" y="137" font-family="Fredoka,sans-serif" font-weight="700" font-size="15" fill="#1b2559" text-anchor="middle">C</text>
+  <circle cx="140" cy="130" r="18" fill="#6db3ff" stroke="#1b2559" stroke-width="2.5"/><text x="140" y="137" font-family="Fredoka,sans-serif" font-weight="700" font-size="15" fill="#1b2559" text-anchor="middle">D</text>
+  <line x1="48" y1="30" x2="122" y2="30" stroke="#1b2559" stroke-width="2.5"/>
+  <line x1="42" y1="45" x2="36" y2="115" stroke="#1b2559" stroke-width="2.5"/>
+  <line x1="128" y1="45" x2="42" y2="118" stroke="#1b2559" stroke-width="2.5"/>
+  <line x1="48" y1="130" x2="122" y2="130" stroke="#1b2559" stroke-width="2.5"/>
+</g>
+</svg>`;
+
+/* Hayotiy vaziyatni modellash rasmi (shrift kichraytirilgan) */
+const SVGMODEL=`<svg viewBox="0 0 600 250" role="img" aria-label="Maktab avtobusi vaziyatini graf bilan modellash">
+<rect width="600" height="250" fill="#f8fbff" rx="10"/>
+<text x="300" y="24" font-family="Fredoka,sans-serif" font-weight="700" font-size="15" fill="#1b2559" text-anchor="middle">Maktab avtobusi qishloqlarga qanday qatnaydi?</text>
+<!-- Chap: vaziyat -->
+<g transform="translate(16,42)">
+  <rect x="0" y="0" width="268" height="195" rx="10" fill="#fff" stroke="#1b2559" stroke-width="2.5"/>
+  <text x="134" y="22" font-family="Nunito,sans-serif" font-weight="800" font-size="11" fill="#4a5688" text-anchor="middle">Vaziyat: qishloqlar va yo'llar</text>
+  <circle cx="70" cy="70" r="16" fill="#ff7b7b" stroke="#1b2559" stroke-width="2.5"/><text x="70" y="77" font-family="Fredoka,sans-serif" font-weight="700" font-size="14" fill="#1b2559" text-anchor="middle">A</text>
+  <circle cx="195" cy="70" r="16" fill="#ffd25c" stroke="#1b2559" stroke-width="2.5"/><text x="195" y="77" font-family="Fredoka,sans-serif" font-weight="700" font-size="14" fill="#1b2559" text-anchor="middle">B</text>
+  <circle cx="70" cy="150" r="16" fill="#5fd8c7" stroke="#1b2559" stroke-width="2.5"/><text x="70" y="157" font-family="Fredoka,sans-serif" font-weight="700" font-size="14" fill="#1b2559" text-anchor="middle">C</text>
+  <circle cx="195" cy="150" r="16" fill="#6db3ff" stroke="#1b2559" stroke-width="2.5"/><text x="195" y="157" font-family="Fredoka,sans-serif" font-weight="700" font-size="14" fill="#1b2559" text-anchor="middle">D</text>
+  <line x1="86" y1="70" x2="179" y2="70" stroke="#1b2559" stroke-width="2.5"/>
+  <line x1="70" y1="86" x2="70" y2="134" stroke="#1b2559" stroke-width="2.5"/>
+  <line x1="86" y1="70" x2="179" y2="150" stroke="#1b2559" stroke-width="2.5"/>
+  <text x="134" y="185" font-family="Nunito,sans-serif" font-size="10" fill="#4a5688" text-anchor="middle">Yo'llar: A–B, A–C, A–D</text>
+</g>
+<!-- O'q -->
+<text x="300" y="145" font-family="Fredoka,sans-serif" font-weight="700" font-size="22" fill="#1b2559" text-anchor="middle">→</text>
+<!-- O'ng: model -->
+<g transform="translate(320,42)">
+  <rect x="0" y="0" width="264" height="195" rx="10" fill="#fff3c9" stroke="#1b2559" stroke-width="2.5"/>
+  <text x="132" y="22" font-family="Nunito,sans-serif" font-weight="800" font-size="11" fill="#4a5688" text-anchor="middle">Model: G = (V, E)</text>
+  <text x="132" y="50" font-family="Fredoka,sans-serif" font-weight="700" font-size="13" fill="#1c6ef2" text-anchor="middle">V = {A, B, C, D}</text>
+  <text x="132" y="72" font-family="Fredoka,sans-serif" font-weight="700" font-size="13" fill="#0b7a5c" text-anchor="middle">E = {AB, AC, AD}</text>
+  <line x1="18" y1="84" x2="246" y2="84" stroke="#cfe2fb" stroke-width="1.5"/>
+  <text x="132" y="104" font-family="Nunito,sans-serif" font-size="11" fill="#4a5688" text-anchor="middle">|V| = 4 — qishloqlar soni</text>
+  <text x="132" y="124" font-family="Nunito,sans-serif" font-size="11" fill="#4a5688" text-anchor="middle">|E| = 3 — yo'llar soni</text>
+  <text x="132" y="148" font-family="Nunito,sans-serif" font-size="11" fill="#4a5688" text-anchor="middle">A darajasi = 3 (markaziy)</text>
+  <text x="132" y="168" font-family="Nunito,sans-serif" font-size="11" fill="#4a5688" text-anchor="middle">B, C, D darajalari = 1</text>
+</g>
+</svg>`;
+
+function tf(items){
+  return items.map((it,i)=>`<div class="card" data-i="${i}"><p>${it.q}</p><div class="row" style="margin-top:6px"><button class="btn go" data-a="1" type="button">Mumkin</button><button class="btn red" data-a="0" type="button">Mumkin emas</button></div><div class="fb" hidden></div></div>`).join('');
+}
+window.buildTheory=function(){
+  const v=document.createElement('section');v.className='view';v.id='v-nazariya';v.hidden=true;
+  const life=[['metro',`🚇 Metro sxemasi`,`Bekatlar uchlar, bekatlar orasidagi yo'l qirralar.`],['ijtimoiy',`📱 Ijtimoiy tarmoq`,`Har bir odam uch, do'stlik esa qirra.`],['navigator',`🗺️ Navigator`,`Chorrahalar uchlar, ko'chalar qirralar. Son masofani bildiradi.`],['avia',`✈️ Aviareyslar`,`Shaharlar uchlar, reyslar qirralar.`],['internet',`🌐 Internet`,`Kompyuterlar uchlar, simlar qirralar.`],['molekula',`🧪 Molekula`,`Atomlar uchlar, kimyoviy bog'lar qirralar.`]];
+  v.innerHTML=`<div class="sec-head"><h2>Graf nima?</h2><p>Graf nuqtalardan (uchlar) va ularni tutashtiruvchi chiziqlardan (qirralar) iborat chizma. Unda faqat kim kim bilan bog'langani muhim, chizma qanday ko'rinishi muhim emas.</p></div>
+  <div class="cards">${life.map(([key,title,desc])=>`<div class="life" data-life="${key}" tabindex="0" role="button"><span class="hint-tap">bosing →</span><div class="pic">${title.slice(0,2)}</div><h3>${title.slice(2)}</h3><p>${desc}</p></div>`).join('')}</div>
+
+  <div class="sec-head"><h2>Graflarni qanday belgilaymiz?</h2><p>Matematikada graf ikki to'plam yordamida yoziladi: uchlar to'plami V va qirralar to'plami E. Buni qisqacha <b>G = (V, E)</b> ko'rinishida yozamiz.</p></div>
+  <div class="kb">${SVGMATH}</div>
+  <div class="theo" style="margin-top:14px"><div class="txt">
+    <div class="card"><h3>Yozilishi</h3><p><b>G = (V, E)</b> — bu yerda:</p><ul class="defs" style="margin-top:6px">
+      <li><b style="background:#1c6ef2">V</b><span>uchlar to'plami: V = {A, B, C, D}</span></li>
+      <li><b style="background:#0b7a5c">E</b><span>qirralar to'plami: E = {AB, AC, BC, CD}</span></li>
+      <li><b style="background:#c2410c">|V|</b><span>uchlar soni (bu misolda 4 ta)</span></li>
+      <li><b style="background:#c2255c">|E|</b><span>qirralar soni (bu misolda 4 ta)</span></li>
+    </ul></div>
+  </div><div class="txt">
+    <div class="card"><h3>Misol</h3><p>Uchlar: <b>V = {1, 2, 3}</b>, qirralar: <b>E = {12, 13, 23}</b>. Bu uchburchak — to'liq graf.</p><p style="margin-top:4px">Har bir qirra ikki uchni bog'laydi: 12 qirrasi 1 va 2 uchlarni tutashtiradi.</p></div>
+    <div class="card"><h3>Eslatma</h3><p>|V| va |E| belgilaridagi vertikal chiziqlar "to'plamdagi elementlar soni" degan ma'noni bildiradi. Masalan, |V| = 4 — to'plamda 4 ta uch bor.</p></div>
+  </div></div>
+
+  <div class="sec-head"><h2>Asosiy tushunchalar</h2></div>
+  <div class="theo"><div class="txt"><ul class="defs">
+   <li><b style="background:#e63946">Uch</b><span>graf nuqtasi.</span></li>
+   <li><b style="background:#1c6ef2">Qirra</b><span>ikki uchni tutashtiruvchi chiziq.</span></li>
+   <li><b style="background:#c2410c">Daraja</b><span>uchdan chiqadigan qirralar soni.</span></li>
+   <li><b style="background:#0b7a5c">Toq / juft uch</b><span>darajasi toq yoki juft bo'lgan uch.</span></li>
+   <li><b style="background:#7c3aed">Yo'l</b><span>qirralar bo'ylab uchdan uchga borish.</span></li>
+   <li><b style="background:#c2255c">Sikl</b><span>boshlangan uchda tugaydigan yo'l.</span></li>
+   <li><b style="background:#0a6e94">Bog'langan</b><span>istalgan uchdan istalgan uchga borish mumkin.</span></li>
+   <li><b style="background:#b45309">Komponenta</b><span>grafning bog'langan alohida bo'lagi.</span></li>
+   <li><b style="background:#1b2559">Xalqa</b><span>uchdan chiqib, o'ziga qaytadigan qirra.</span></li>
+   <li><b style="background:#6d28d9">Daraxt</b><span>sikli yo'q bog'langan graf.</span></li></ul></div>
+   <div><div class="kb" id="t1"></div><div class="row" style="margin:8px 0"><button class="btn pri" id="t1b" type="button" aria-pressed="false">Darajalarni ko'rsat</button></div><div class="sumline" id="t1s">Uchni yoki tugmani bosing</div></div></div>
+
+  <div class="sec-head"><h2>Ikki teorema</h2></div>
+  <div class="theo"><div class="txt"><div class="card"><h3>1-teorema</h3><p>Hamma uchlarning darajalari yig'indisi qirralar sonining ikki baravariga teng. Chunki har bir qirra ikkita uchni tutashtiradi va ikki marta sanaladi.</p></div>
+   <div class="card"><h3>2-teorema</h3><p>Har qanday grafda toq uchlar soni juft bo'ladi. Aks holda darajalar yig'indisi toq chiqib, 1-teoremaga zid bo'ladi.</p></div></div>
+   <div class="txt" id="tfs">${tf([{q:`Sinfda 9 ta kompyuter bor. Har biri boshqa 5 ta kompyuter bilan sim orqali ulanishi mumkinmi?`,r:`9·5 = 45 toq son, darajalar yig'indisi esa doim juft bo'ladi.`},{q:`Turnirda har bir ishtirokchi 5 tadan o'yin o'ynaydi va jami 123 ta o'yin o'tkaziladi. Bu mumkinmi?`,r:`Darajalar yig'indisi 2·123 = 246 bo'lishi kerak, lekin 5 ga karrali emas, ishtirokchilar soni butun chiqmaydi (246 : 5 = 49,2).`},{q:`24 nafar o'quvchidan 7 tasi 3 tadan, 8 tasi 5 tadan, 9 tasi 6 tadan do'stga ega bo'lishi mumkinmi?`,r:`Toq uchlar: 7 + 8 = 15 ta. Toq uchlar soni toq bo'lolmaydi.`}])}</div></div>
+
+  <div class="sec-head"><h2>Eyler qoidasi: qalamni uzmay chizish</h2><p>Grafning <b>hamma qirralaridan bir martadan</b> o'tib, qalamni uzmasdan chizish mumkinmi? Bunga javob <b>toq darajali uchlar soniga</b> bog'liq. Toq darajali uch — darajasi toq son bo'lgan uch (masalan, 1, 3, 5...).</p></div>
+  <div class="eyler-rule">
+    <div class="rc good"><span class="tag">MUMKIN — sikl</span><h3>0 ta toq uch</h3><div class="kb" id="eg0"></div><p>Hamma uchlarning darajasi juft. Istalgan uchdan boshlab, <b>o'sha uchda</b> tugatasiz. Bu — Eyler sikli.</p><p style="margin-top:4px"><b>Misol:</b> beshburchak, yulduz, to'rtburchak.</p></div>
+    <div class="rc good"><span class="tag">MUMKIN — yo'l</span><h3>2 ta toq uch</h3><div class="kb" id="eg2"></div><p>Faqat 2 ta uch toq. <b>Bitta toq uchdan boshlab</b>, <b>ikkinchi toq uchda</b> tugatasiz. Bu — Eyler yo'li.</p><p style="margin-top:4px"><b>Misol:</b> konvert shakli.</p></div>
+    <div class="rc bad"><span class="tag">MUMKIN EMAS</span><h3>2 tadan ko'p toq uch</h3><div class="kb" id="eg4"></div><p>3 ta, 4 ta yoki undan ko'p toq uch bo'lsa, hamma qirradan bir martadan o'tib bo'lmaydi. Hech qanday hiyla yordam bermaydi.</p><p style="margin-top:4px"><b>Misol:</b> Kenigsberg ko'priklari.</p></div>
+  </div>
+  <div class="fb info" style="max-width:80ch"><b>Qoida qisqacha:</b> toq darajali uchlar soni <b>0</b> yoki <b>2</b> bo'lsa — chizish mumkin. <b>2 tadan ko'p</b> bo'lsa — mumkin emas. Toq uchlar soni hech qachon toq bo'lmaydi (2-teorema).</div>
+
+  <div class="sec-head"><h2>Hayotiy vaziyatni graflar bilan modellash</h2><p>Maktabga avtobus qatnaydigan qishloqlar masalasini ko'ramiz. Maqsad: qaysi qishloqqa avtobus borishini va qaysi qishloq eng ko'p yo'lga ega ekanini aniqlash.</p></div>
+  <div class="kb">${SVGMODEL}</div>
+  <div class="theo" style="margin-top:14px">
+    <div class="txt"><div class="card"><h3>1-qadam: Vaziyatni tahlil qilish</h3><p>To'rtta qishloq bor: A, B, C, D. Yo'llar: A–B, A–C, A–D. B, C, D o'zaro to'g'ridan-to'g'ri bog'lanmagan, faqat A orqali borish mumkin.</p></div>
+    <div class="card"><h3>2-qadam: Model tuzish</h3><p>Uchlar to'plami: <b>V = {A, B, C, D}</b>. Qirralar to'plami: <b>E = {AB, AC, AD}</b>. Graf: <b>G = (V, E)</b>.</p></div></div>
+    <div class="txt"><div class="card"><h3>3-qadam: Tahlil qilish</h3><p>A uchining darajasi 3 — u barcha qishloqlar bilan bog'langan, markaziy qishloq. B, C, D darajalari 1 tadan. Demak, avtobus A dan barcha qishloqlarga bir marta borishi mumkin, lekin B dan D ga to'g'ridan-to'g'ri borilmaydi — A orqali o'tish kerak.</p></div>
+    <div class="card"><h3>Xulosa</h3><p>Graf modeli vaziyatni sodda ko'rinishda tasvirlaydi va savollarga tez javob berishga yordam beradi: qaysi qishloqqa borish mumkin, qaysi yo'l qisqa, qaysi qishloq markaziy.</p></div></div>
+  </div>
+
+  <div class="sec-head"><h2>Kenigsberg ko'priklari</h2><p>Kenigsberg shahridan Pregol daryosi oqib o'tadi. Daryoda ikkita orol va qirg'oqlar bor. Ularni 7 ta ko'prik bog'laydi (a, b, c, d, e, f, g). Shaharlik ko'priklarning har biridan bir martadan o'tib, boshlagan joyiga qaytib kela olarmikin?</p></div>
+  <div class="kb">${SVGMAP}</div>
+  <div class="theo" style="margin-top:14px"><div class="txt">
+    <div class="card"><h3>Hududlar va ko'priklar</h3><ul class="defs" style="margin-top:6px">
+      <li><b style="background:#e63946">A</b><span>shimoliy qirg'oq</span></li>
+      <li><b style="background:#ffb400">B</b><span>g'arbiy orol</span></li>
+      <li><b style="background:#2f80ff">D</b><span>sharqiy orol</span></li>
+      <li><b style="background:#12b886">C</b><span>janubiy qirg'oq</span></li>
+    </ul><p style="margin-top:8px">Ko'priklar: a, b (A–B), c, d (C–B), e (A–D), f (C–D), g (B–D).</p></div>
+    <div class="card"><h3>Darajalarni sanaymiz</h3><p>A: a, b, e → daraja <b>3</b> (toq).</p><p>B: a, b, c, d, g → daraja <b>5</b> (toq).</p><p>C: c, d, f → daraja <b>3</b> (toq).</p><p>D: e, f, g → daraja <b>3</b> (toq).</p><p style="margin-top:6px"><b>Toq uchlar: 4 ta.</b> Eyler qoidasiga ko'ra, 2 tadan ko'p — demak, mumkin emas.</p></div>
+  </div><div class="txt"><div class="kb" id="tk"></div><div class="fb info" style="margin-top:10px"><b>Eyler (1736):</b> A, B, C, D uchlarning darajalari 3, 5, 3, 3: hammasi toq. Toq uchlar 4 ta bo'lgani uchun yurish mumkin emas. Toq uchlar soni 0 yoki 2 bo'lsa, mumkin.</div></div></div>`;
+  const st={showDeg:false};
+  const rd=()=>{GD.draw($('#t1',v),T1,{showDeg:st.showDeg,onNode:()=>tog()});const d=GD.deg(T1);$('#t1s',v).textContent=st.showDeg?`${d.join(' + ')} = ${d.reduce((a,b)=>a+b,0)} = 2 × ${T1.e.length}`:'Uchni yoki tugmani bosing';};
+  const tog=()=>{st.showDeg=!st.showDeg;$('#t1b',v).setAttribute('aria-pressed',st.showDeg);rd();};
+  $('#t1b',v).onclick=tog;
+  setTimeout(()=>{rd();
+    GD.draw($('#tk',v),{...KEN,showDeg:true},{showDeg:true});
+    const d0=GD.deg(EG0),d2=GD.deg(EG2),d4=GD.deg(EG4);
+    GD.draw($('#eg0',v),EG0,{showDeg:true,col:EG0.n.map((_,i)=>d0[i]%2?'#ff7b7b':'#a6e86a')});
+    GD.draw($('#eg2',v),EG2,{showDeg:true,col:EG2.n.map((_,i)=>d2[i]%2?'#ff7b7b':'#a6e86a')});
+    GD.draw($('#eg4',v),EG4,{showDeg:true,col:EG4.n.map((_,i)=>d4[i]%2?'#ff7b7b':'#a6e86a')});
+  },0);
+  const R=[`9·5 = 45 toq son, darajalar yig'indisi esa doim juft bo'ladi.`,`Darajalar yig'indisi 2·123 = 246 bo'lishi kerak. Lekin 246 ni 5 ga bo'lsak, ishtirokchilar soni 49,2 chiqadi, butun emas.`,`Toq uchlar: 7 + 8 = 15 ta. Toq uchlar soni toq bo'lolmaydi.`];
+  $$('#tfs .card',v).forEach((c,i)=>$$('button',c).forEach(b=>b.onclick=()=>{const fb=$('.fb',c);fb.hidden=false;const ok=+b.dataset.a===0;fb.className='fb '+(ok?'ok':'bad');fb.textContent=(ok?'To\'g\'ri, mumkin emas. ':'Yana o\'ylab ko\'ring. ')+(ok?R[i]:'Darajalar yig\'indisini hisoblang.');}));
+
+  $$('.life',v).forEach(card=>{
+    const open=()=>{
+      const key=card.dataset.life,L=LIFE[key];
+      const bg=document.createElement('div');bg.className='modal-bg';
+      bg.innerHTML=`<div class="modal"><button class="x" type="button" aria-label="Yopish">×</button><h3>${L.title}</h3><div class="board" id="lb"></div><div class="facts" id="lf"></div><div class="why">${L.why}</div><div class="row" style="margin-top:12px"><button class="btn pri" type="button" id="showdeg">Darajalarni ko'rsatish</button></div></div>`;
+      document.body.appendChild(bg);
+      const close=()=>bg.remove();
+      $('.x',bg).onclick=close;bg.onclick=e=>{if(e.target===bg)close();};
+      const d=GD.deg(L.g);
+      $('#lf',bg).innerHTML=`<span class="pill" style="background:#dcf8e6">Uchlar: ${L.g.n.length} ta</span><span class="pill" style="background:#fff3c9">Qirralar: ${L.g.e.length} ta</span><span class="pill" style="background:#e0f0ff">Darajalar: ${d.join(', ')}</span>`;
+      let sd=false;
+      const rdM=()=>GD.draw($('#lb',bg),L.g,{showDeg:sd});
+      rdM();
+      $('#showdeg',bg).onclick=()=>{sd=!sd;rdM();};
+    };
+    card.onclick=open;
+    card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};
+  });
+
+  function $(s,r){return (r||document).querySelector(s);} function $$(s,r){return Array.from((r||document).querySelectorAll(s));}
+  return v;
+};
+})();
+</script>
+
+</body></html>
